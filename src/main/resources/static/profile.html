@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Green Trace - Profile</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f0fdf4;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+    }
+    input, textarea, select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    button {
+        background: #2e8b57;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #1f6e45;
+    }
+    .message {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        display: none;
+    }
+    .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>My Profile</h1>
+
+  <div id="message" class="message"></div>
+
+  <form id="profileForm">
+    <div>
+      <label>Full Name:</label>
+      <input type="text" id="fullName">
+    </div>
+
+    <div>
+      <label>Email:</label>
+      <input type="email" id="email">
+    </div>
+
+    <div>
+      <label>Phone:</label>
+      <input type="text" id="phone">
+    </div>
+
+    <div>
+      <label>Location:</label>
+      <input type="text" id="location">
+    </div>
+
+    <div>
+      <label>Skill Level:</label>
+      <select id="skillLevel">
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+        <option value="expert">Expert</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Bio:</label>
+      <textarea id="bio" rows="4"></textarea>
+    </div>
+
+    <button type="submit">Save Changes</button>
+  </form>
+</div>
+
+<script>
+  const API_BASE_URL = 'http://localhost:8082/api';
+  const userId = localStorage.getItem('userId');
+
+  if (!userId) {
+      window.location.href = 'login.html';
+  }
+
+  async function loadProfile() {
+      try {
+          const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+          if (response.ok) {
+              const user = await response.json();
+              document.getElementById('fullName').value = user.fullName || '';
+              document.getElementById('email').value = user.email || '';
+              document.getElementById('phone').value = user.phone || '';
+              document.getElementById('location').value = user.location || '';
+              document.getElementById('skillLevel').value = user.skillLevel || 'intermediate';
+              document.getElementById('bio').value = user.bio || '';
+          } else {
+              showMessage('Failed to load profile', 'error');
+          }
+      } catch (error) {
+          showMessage('Error loading profile: ' + error.message, 'error');
+      }
+  }
+
+  async function saveProfile(event) {
+      event.preventDefault();
+
+      const profileData = {
+          fullName: document.getElementById('fullName').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          location: document.getElementById('location').value,
+          skillLevel: document.getElementById('skillLevel').value,
+          bio: document.getElementById('bio').value,
+          dietaryPreferences: []
+      };
+
+      try {
+          const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(profileData)
+          });
+
+          if (response.ok) {
+              showMessage('Profile updated successfully!', 'success');
+              loadProfile();
+          } else {
+              const error = await response.text();
+              showMessage('Failed to update profile: ' + error, 'error');
+          }
+      } catch (error) {
+          showMessage('Error saving profile: ' + error.message, 'error');
+      }
+  }
+
+  function showMessage(msg, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = msg;
+      messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
+      setTimeout(() => {
+          messageDiv.style.display = 'none';
+      }, 3000);
+  }
+
+  document.getElementById('profileForm').addEventListener('submit', saveProfile);
+  loadProfile();
+</script>
+</body>
+</html>

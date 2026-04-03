@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Green Trace</title>
+
+    <style>
+
+        body{
+        margin:0;
+        font-family:Arial, sans-serif;
+        height:100vh;
+        background-image:url("https://miro.medium.com/v2/resize:fit:1200/0*wsWIB7I_n0XYMGca");
+        background-size:cover;
+        background-position:center;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        }
+
+        /* dark overlay */
+        .overlay{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.5);
+        }
+
+        /* content area */
+        .content{
+        position:relative;
+        text-align:center;
+        color:white;
+        max-width:700px;
+        z-index:1;
+        }
+
+        .content h1{
+        font-size:50px;
+        margin-bottom:15px;
+        }
+
+        .content span{
+        color:#f7b733;
+        }
+
+        .content p{
+        font-size:18px;
+        margin-bottom:35px;
+        }
+
+        button{
+        background:#7cb518;
+        border:none;
+        padding:15px 40px;
+        font-size:18px;
+        border-radius:30px;
+        cursor:pointer;
+        color:white;
+        }
+
+        button:hover{
+        background:#5c940d;
+        }
+        .logo{
+        position:absolute;
+        top:20px;
+        font-size:28px;
+        left:0;
+        background-color: rgb(82, 117, 82);
+        font-weight:500;
+        color:rgb(238, 244, 239);
+        z-index:1;
+        border-radius: 12px;
+        width:20%;
+        height:80px;
+        display:flex;
+        align-items:center;
+        padding-left:30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="logo">🌱The Green Trace</div>
+
+<div class="content">
+
+    <h1>Find the perfect recipes <span>everyday</span></h1>
+
+    <p>Cook Smart • Eat Healthy • Reduce Food Waste</p>
+
+    <a href="signup.html">
+        <button class="start-btn">Get Started</button>
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Green Trace - Sign Up</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-image: url("https://images.unsplash.com/photo-1490818387583-1baba5e638af");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .signup-box {
+            position: relative;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            z-index: 2;
+        }
+        .signup-box h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #7cb518;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #5c940d;
+        }
+        p {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .success-message {
+            color: green;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="signup-box">
+    <h2> Green Trace Sign Up</h2>
+    <form id="signupForm">
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <input type="text" id="username" placeholder="Username (min 3 characters)" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password (min 6 characters)" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        <button type="submit">Create Account</button>
+        <p>Already have an account? <a href="login.html">Login</a></p>
+    </form>
+</div>
+
+<script>
+    // API URL - Change this if your backend is on a different port
+    const API_BASE_URL = 'http://localhost:8082/api';
+
+    // Get form element
+    const form = document.getElementById('signupForm');
+
+    // Handle form submission
+    form.addEventListener('submit', async function(event) {
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Get form values
+        const fullName = document.getElementById('fullName').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+
+        // Hide previous messages
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+
+        // Validate inputs
+        if (!fullName) {
+            errorDiv.textContent = 'Full name is required';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (!username || username.length < 3) {
+            errorDiv.textContent = 'Username must be at least 3 characters';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (!email) {
+            errorDiv.textContent = 'Email is required';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (!password || password.length < 6) {
+            errorDiv.textContent = 'Password must be at least 6 characters';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            errorDiv.textContent = 'Passwords do not match';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        // Prepare data to send
+        const userData = {
+            username: username,
+            email: email,
+            password: password,
+            fullName: fullName
+        };
+
+        console.log('Sending data:', userData);
+
+        try {
+            // Send POST request
+            const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            // Get response
+            const data = await response.json();
+            console.log('Response:', data);
+
+            // Check if successful
+            if (response.ok) {
+                successDiv.textContent = '✅ Account created successfully! Redirecting to login...';
+                successDiv.style.display = 'block';
+
+                // Clear form
+                form.reset();
+
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } else {
+                // Show error message
+                errorDiv.textContent = data.error || data.message || 'Registration failed';
+                errorDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            errorDiv.textContent = `❌ Network error: ${error.message}. Make sure backend is running on ${API_BASE_URL}`;
+            errorDiv.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>

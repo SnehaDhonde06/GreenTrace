@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Green Trace Login</title>
+  <style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-image: url("https://images.unsplash.com/photo-1490818387583-1baba5e638af");
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+    }
+    .login-box {
+        position: relative;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        width: 350px;
+        text-align: center;
+        z-index: 2;
+    }
+    .login-box h2 {
+        color: #2e7d32;
+        margin-bottom: 20px;
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #7cb518;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 25px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    button:hover {
+        background: #5c940d;
+    }
+    p {
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    a {
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="login-box">
+  <h2>Green Trace Login</h2>
+  <form id="loginForm">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <div id="errorMessage" class="error-message"></div>
+    <button type="submit">Login</button>
+    <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+  </form>
+</div>
+
+<script>
+  // Change API URL to port 8082
+  const API_BASE_URL = 'http://localhost:8082/api';
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+              localStorage.setItem('userId', data.id);
+              localStorage.setItem('username', data.username);
+              localStorage.setItem('userEmail', data.email);
+              localStorage.setItem('fullName', data.fullName);
+
+              window.location.href = 'dashboard.html';
+          } else {
+              document.getElementById('errorMessage').textContent = data.error || 'Login failed';
+              document.getElementById('errorMessage').style.display = 'block';
+          }
+      } catch (error) {
+          document.getElementById('errorMessage').textContent = 'Network error. Please try again.';
+          document.getElementById('errorMessage').style.display = 'block';
+      }
+  });
+
+if (data.token) {
+    localStorage.setItem('authToken', data.token);
+}
+</script>
+</body>
+</html>

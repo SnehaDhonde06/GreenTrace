@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Trace Dashboard - Indian & Global Recipes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0fdf4;
+            margin-left: 240px;
+            transition: all 0.3s;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100%;
+            background: #1e6b3e;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding-top: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar .logo {
+            color: white;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid #3c9e6b;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin: 4px 0;
+        }
+
+        .sidebar a:hover {
+            background: #0f5a36;
+            padding-left: 30px;
+        }
+
+        .sidebar .logout {
+            background: #c0392b;
+            margin-top: 30px;
+        }
+
+        .sidebar .logout:hover {
+            background: #a83226;
+        }
+
+        /* Header Logout Button */
+        .header-logout {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: white;
+            color: #2e8b57;
+            border: 2px solid #2e8b57;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .header-logout:hover {
+            background: #2e8b57;
+            color: white;
+        }
+
+        /* Welcome Section */
+        .welcome {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6d9 100%);
+            margin: 20px 30px;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .welcome h2 {
+            color: #1e6b3e;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .welcome p {
+            color: #2c5e42;
+            font-size: 1.1rem;
+        }
+
+        /* Main Container */
+        .container {
+            padding: 20px 30px 40px 30px;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #d4ecdd;
+        }
+
+        .search-card h2 {
+            color: #1e6b3e;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 2px solid #c8e0d2;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #2e8b57;
+            box-shadow: 0 0 0 3px rgba(46,139,86,0.1);
+        }
+
+        .input-group button {
+            padding: 12px 30px;
+            font-size: 1rem;
+            background: #2e8b57;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .input-group button:hover {
+            background: #1f6e45;
+            transform: translateY(-2px);
+        }
+
+        /* Category Buttons */
+        .categories {
+            margin-top: 20px;
+        }
+
+        .categories h3 {
+            color: #2c5e42;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .cat-btn {
+            background: #e6ffe6;
+            color: #2e8b57;
+            border: 1px solid #2e8b57;
+            padding: 8px 20px;
+            margin: 5px 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .cat-btn:hover {
+            background: #2e8b57;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .cat-btn.indian {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e67e22;
+        }
+
+        .cat-btn.indian:hover {
+            background: #ff9800;
+            color: white;
+        }
+
+        /* Results Section */
+        .results-header {
+            margin: 30px 0 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .results-header h2 {
+            color: #1e6b3e;
+            font-size: 1.6rem;
+        }
+
+        .results-header small {
+            color: #6c8b7a;
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 1px solid #e0f0e5;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .recipe-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #d9e8df;
+        }
+
+        .recipe-content {
+            padding: 20px;
+        }
+
+        .recipe-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1e6b3e;
+            margin-bottom: 12px;
+        }
+
+        .ingredients-list {
+            background: #f8fff9;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #2c5e42;
+            border-left: 3px solid #2e8b57;
+        }
+
+        .used-ingredients {
+            background: #fff3e0;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #b86f2c;
+        }
+
+        .missed-ingredients {
+            background: #ffe8e8;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #c0392b;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 15px 0;
+            padding: 8px 12px;
+            background: #f0f7f2;
+            border-radius: 40px;
+            flex-wrap: wrap;
+        }
+
+        .quantity-control label {
+            font-weight: 600;
+            color: #2c5e42;
+            font-size: 0.85rem;
+        }
+
+        .quantity-control input {
+            width: 70px;
+            padding: 5px 8px;
+            border: 1px solid #c8e0d2;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .quantity-control button {
+            background: #e0f0e4;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #1e6b3e;
+            font-size: 0.85rem;
+        }
+
+        .quantity-control button:hover {
+            background: #c8e6d5;
+        }
+
+        .recipe-link {
+            display: inline-block;
+            background: #ffebee;
+            color: #c0392b;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            margin-top: 10px;
+            margin-right: 8px;
+        }
+
+        .recipe-link:hover {
+            background: #fadbd7;
+            transform: translateX(3px);
+        }
+
+        .save-recipe-btn {
+            display: inline-block;
+            background: #2e8b57;
+            color: white;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .save-recipe-btn:hover {
+            background: #1f6e45;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            color: #2e8b57;
+            background: white;
+            border-radius: 20px;
+        }
+
+        .no-recipes {
+            text-align: center;
+            padding: 60px;
+            background: #fff9e6;
+            border-radius: 20px;
+            color: #b86f2c;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            background: #ffe8e8;
+            border-radius: 20px;
+            color: #c0392b;
+        }
+
+        .indian-highlight {
+            background: linear-gradient(135deg, #fff3e0, #ffe8d4);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .indian-highlight h4 {
+            color: #e67e22;
+            margin-bottom: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2e8b57;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                margin-left: 0;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            .header-logout {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1001;
+            }
+            .welcome, .container {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar Navigation -->
+<div class="sidebar">
+    <h2 class="logo">🌱 Green Trace</h2>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="nutrition.html">📊 Nutrition Dashboard</a>
+    <a href="foodPrev.html">♻️ Waste Tracker</a>
+    <a href="login.html" class="logout">🚪 Logout</a>
+</div>
+
+<!-- Header Logout Button -->
+<button class="header-logout" onclick="handleLogout()">🚪 Logout</button>
+
+<!-- Welcome Section -->
+<div class="welcome">
+    <h2>Welcome to Green Trace! 👋</h2>
+    <p>Discover delicious Indian & International recipes using ingredients you have at home!</p>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <div class="search-card">
+        <h2>🍳 Find Recipes Using Your Ingredients</h2>
+        <div class="input-group">
+            <input type="text" id="ingredients" placeholder="e.g., tomato, onion, chicken, paneer, dal, rice" value="tomato, onion, garlic">
+            <button onclick="performRecipeSearch()">🔍 Find Recipes</button>
+        </div>
+
+        <!-- Quick Categories -->
+        <div class="categories">
+            <h3>✨ Popular Indian Cuisine</h3>
+            <button class="cat-btn indian" onclick="quickSearch('paneer, tomato, onion, cream')">🫓 Paneer Butter Masala</button>
+            <button class="cat-btn indian" onclick="quickSearch('chicken, yogurt, spices, onion')">🍗 Butter Chicken</button>
+            <button class="cat-btn indian" onclick="quickSearch('dal, tomato, onion, garlic')">🍛 Dal Tadka</button>
+            <button class="cat-btn indian" onclick="quickSearch('potato, cauliflower, peas, spices')">🥔 Aloo Gobi</button>
+            <button class="cat-btn indian" onclick="quickSearch('spinach, paneer, cream, garlic')">🌿 Palak Paneer</button>
+            <button class="cat-btn indian" onclick="quickSearch('rice, vegetables, biryani spices')">🍚 Veg Biryani</button>
+            <button class="cat-btn indian" onclick="quickSearch('chickpeas, onion, tomato, spices')">🍛 Chole Masala</button>
+            <button class="cat-btn indian" onclick="quickSearch('eggplant, tomato, onion, spices')">🍆 Baingan Bharta</button>
+        </div>
+
+        <div class="categories">
+            <h3>🌍 International & Other Cuisines</h3>
+            <button class="cat-btn" onclick="quickSearch('tomato, basil, mozzarella, pasta')">🍝 Italian Pasta</button>
+            <button class="cat-btn" onclick="quickSearch('chicken, soy sauce, ginger, garlic')">🥢 Asian Stir Fry</button>
+            <button class="cat-btn" onclick="quickSearch('avocado, quinoa, chickpeas, spinach')">🥗 Healthy Bowl</button>
+            <button class="cat-btn" onclick="quickSearch('egg, bell pepper, onion, cheese')">🍳 Mexican Omelette</button>
+            <button class="cat-btn" onclick="quickSearch('mushroom, cream, garlic, pasta')">🍄 Creamy Mushroom Pasta</button>
+            <button class="cat-btn" onclick="quickSearch('salmon, lemon, garlic, asparagus')">🐟 Lemon Herb Salmon</button>
+        </div>
+
+        <div class="categories">
+            <h3>🥘 Quick Indian Breakfast & Snacks</h3>
+            <button class="cat-btn indian" onclick="quickSearch('sooji, vegetables, mustard seeds')">🥞 Rava Idli</button>
+            <button class="cat-btn indian" onclick="quickSearch('rice, urad dal, fenugreek')">🥞 Dosa</button>
+            <button class="cat-btn indian" onclick="quickSearch('bread, vegetables, spices')">🍞 Masala Toast</button>
+            <button class="cat-btn indian" onclick="quickSearch('poha, onion, peanuts, curry leaves')">🥣 Poha</button>
+            <button class="cat-btn indian" onclick="quickSearch('besan, onion, spices')">🍘 Besan Chilla</button>
+        </div>
+    </div>
+
+    <div class="results-header">
+        <h2>🍽️ Recommended Recipes</h2>
+        <small>⚡ Adjust serving size to scale quantities | 📌 Save recipes to your profile</small>
+    </div>
+    <div id="recipeResultsContainer">
+        <div class="no-recipes">
+            🌟 Enter ingredients above and click "Find Recipes" to discover amazing Indian and International dishes!
+        </div>
+    </div>
+</div>
+
+<script>
+    // API Configuration - Change to your backend port
+    const API_BASE_URL = 'http://localhost:8082/api';
+
+    // Indian Recipe Fallback Database
+    const indianRecipeFallback = [
+        {
+            id: 1001,
+            title: "🫔 Paneer Butter Masala",
+            ingredients: ["paneer", "tomato", "onion", "cream", "butter", "cashew"],
+            image: "https://via.placeholder.com/400x200/FFA07A/FFFFFF?text=Paneer+Butter+Masala",
+            readyInMinutes: 35,
+            servings: 4,
+            cuisine: "Indian"
+        },
+        {
+            id: 1002,
+            title: "🍗 Butter Chicken",
+            ingredients: ["chicken", "tomato", "onion", "cream", "butter", "garlic"],
+            image: "https://via.placeholder.com/400x200/F4A460/FFFFFF?text=Butter+Chicken",
+            readyInMinutes: 45,
+            servings: 4,
+            cuisine: "Indian"
+        },
+        {
+            id: 1003,
+            title: "🥔 Aloo Gobi",
+            ingredients: ["potato", "cauliflower", "onion", "tomato", "turmeric", "cumin"],
+            image: "https://via.placeholder.com/400x200/DAA520/FFFFFF?text=Aloo+Gobi",
+            readyInMinutes: 30,
+            servings: 3,
+            cuisine: "Indian"
+        },
+        {
+            id: 1004,
+            title: "🌿 Palak Paneer",
+            ingredients: ["spinach", "paneer", "onion", "garlic", "cream", "spices"],
+            image: "https://via.placeholder.com/400x200/6B8E23/FFFFFF?text=Palak+Paneer",
+            readyInMinutes: 30,
+            servings: 4,
+            cuisine: "Indian"
+        },
+        {
+            id: 1005,
+            title: "🍛 Dal Tadka",
+            ingredients: ["toor dal", "onion", "tomato", "garlic", "cumin", "ghee"],
+            image: "https://via.placeholder.com/400x200/CD853F/FFFFFF?text=Dal+Tadka",
+            readyInMinutes: 40,
+            servings: 4,
+            cuisine: "Indian"
+        },
+        {
+            id: 1006,
+            title: "🍚 Vegetable Biryani",
+            ingredients: ["rice", "onion", "tomato", "carrot", "peas", "biryani masala"],
+            image: "https://via.placeholder.com/400x200/B8860B/FFFFFF?text=Veg+Biryani",
+            readyInMinutes: 50,
+            servings: 4,
+            cuisine: "Indian"
+        },
+        {
+            id: 1007,
+            title: "🍛 Chole Masala",
+            ingredients: ["chickpeas", "onion", "tomato", "garlic", "chole masala", "ginger"],
+            image: "https://via.placeholder.com/400x200/BC8F8F/FFFFFF?text=Chole+Masala",
+            readyInMinutes: 35,
+            servings: 4,
+            cuisine: "Indian"
+        },
+        {
+            id: 1008,
+            title: "🥞 Masala Dosa",
+            ingredients: ["rice", "urad dal", "potato", "onion", "mustard seeds", "curry leaves"],
+            image: "https://via.placeholder.com/400x200/DEB887/FFFFFF?text=Masala+Dosa",
+            readyInMinutes: 30,
+            servings: 4,
+            cuisine: "Indian"
+        }
+    ];
+
+    // Get current user
+    function getCurrentUser() {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            window.location.href = 'login.html';
+            return null;
+        }
+        return userId;
+    }
+
+    // Main search function
+    async function performRecipeSearch() {
+        const ingredients = document.getElementById('ingredients').value.trim();
+
+        if (!ingredients) {
+            alert("🌱 Please enter some ingredients!");
+            return;
+        }
+
+        const container = document.getElementById('recipeResultsContainer');
+        container.innerHTML = '<div class="loading">🔍 Searching for delicious recipes...<br>⏳ Please wait</div>';
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/recipes/search?ingredients=${encodeURIComponent(ingredients)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const recipes = await response.json();
+
+            if (!recipes || recipes.length === 0) {
+                showIndianFallbackRecipes(ingredients);
+                return;
+            }
+
+            renderRecipes(recipes);
+
+        } catch (error) {
+            console.error('API Error:', error);
+            showIndianFallbackRecipes(ingredients);
+        }
+    }
+
+    // Show Indian fallback recipes
+    function showIndianFallbackRecipes(ingredients) {
+        const container = document.getElementById('recipeResultsContainer');
+        const userIngredients = ingredients.toLowerCase().split(/[ ,]+/);
+
+        const matchedRecipes = indianRecipeFallback.filter(recipe => {
+            return recipe.ingredients.some(ing =>
+                userIngredients.some(userIng => ing.includes(userIng) || userIng.includes(ing))
+            );
+        });
+
+        const recipesToShow = matchedRecipes.length > 0 ? matchedRecipes : indianRecipeFallback.slice(0, 4);
+
+        const formattedRecipes = recipesToShow.map(recipe => ({
+            id: recipe.id,
+            title: recipe.title,
+            image: recipe.image,
+            readyInMinutes: recipe.readyInMinutes,
+            servings: recipe.servings,
+            usedIngredients: recipe.ingredients.slice(0, 4).map(ing => ({ name: ing })),
+            missedIngredients: [],
+            extendedIngredients: recipe.ingredients.map((ing, idx) => ({
+                name: ing,
+                amount: idx === 0 ? 200 : (idx === 1 ? 2 : 1),
+                unit: idx === 0 ? "grams" : "pieces"
+            })),
+            sourceUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(recipe.title + " recipe")}`,
+            isIndian: true
+        }));
+
+        container.innerHTML = `
+            <div class="indian-highlight">
+                <h4>🇮🇳 Featured Indian Recipes ✨</h4>
+                <p>Based on your ingredients, here are some delicious Indian dishes you can make!</p>
+            </div>
+        `;
+        renderRecipes(formattedRecipes, true);
+    }
+
+    // Render recipes
+    function renderRecipes(recipes, isIndian = false) {
+        const container = document.getElementById('recipeResultsContainer');
+
+        const grid = document.createElement('div');
+        grid.className = 'recipe-grid';
+
+        recipes.forEach(recipe => {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+
+            const usedIngredients = recipe.usedIngredients || [];
+            const missedIngredients = recipe.missedIngredients || [];
+            const imageUrl = recipe.image || 'https://via.placeholder.com/400x200/2e8b57/ffffff?text=Recipe';
+
+            let ingredientsList = [];
+            if (recipe.extendedIngredients && recipe.extendedIngredients.length > 0) {
+                ingredientsList = recipe.extendedIngredients.map(ing => ({
+                    name: ing.name,
+                    amount: ing.amount,
+                    unit: ing.unit
+                }));
+            } else if (recipe.usedIngredients && recipe.usedIngredients.length > 0) {
+                ingredientsList = recipe.usedIngredients.map(ing => ({
+                    name: ing.name,
+                    amount: ing.amount || 1,
+                    unit: ing.unit || 'unit'
+                }));
+            }
+
+            const originalServings = recipe.servings || 2;
+
+            card.innerHTML = `
+                <img class="recipe-img" src="${imageUrl}" alt="${recipe.title}" onerror="this.src='https://via.placeholder.com/400x200/2e8b57/ffffff?text=${encodeURIComponent(recipe.title)}'">
+                <div class="recipe-content">
+                    <div class="recipe-title">${recipe.title} ${isIndian ? '🇮🇳' : ''}</div>
+                    ${usedIngredients.length > 0 ? `
+                        <div class="used-ingredients">
+                            ✅ <strong>You have:</strong> ${usedIngredients.slice(0, 5).map(i => i.name).join(', ')}
+                        </div>
+                    ` : ''}
+                    ${missedIngredients.length > 0 ? `
+                        <div class="missed-ingredients">
+                            🛒 <strong>You might need:</strong> ${missedIngredients.slice(0, 5).map(i => i.name).join(', ')}
+                        </div>
+                    ` : ''}
+                    <div class="ingredients-list" id="ingredients-${recipe.id}">
+                        <strong>📝 Ingredients & Quantities (${originalServings} servings):</strong><br>
+                        ${ingredientsList.slice(0, 8).map(ing => `• ${ing.amount} ${ing.unit} ${ing.name}`).join('<br>')}
+                        ${ingredientsList.length > 8 ? '<br>• ...and more' : ''}
+                    </div>
+                    <div class="quantity-control">
+                        <label>⚖️ Scale servings:</label>
+                        <button onclick="scaleRecipeIngredients(${recipe.id}, ${originalServings}, -0.5, '${JSON.stringify(ingredientsList).replace(/'/g, "\\'")}')">−</button>
+                        <span id="multiplier-${recipe.id}" style="min-width: 50px; text-align: center; font-weight: bold;">1.0x</span>
+                        <button onclick="scaleRecipeIngredients(${recipe.id}, ${originalServings}, 0.5, '${JSON.stringify(ingredientsList).replace(/'/g, "\\'")}')">+</button>
+                        <input type="number" id="scale-input-${recipe.id}" value="1" step="0.5" min="0.5" max="4" style="width: 65px;">
+                    </div>
+                    ${recipe.readyInMinutes ? `<div style="margin: 10px 0; color: #6c8b7a;">⏱️ Ready in: ${recipe.readyInMinutes} minutes</div>` : ''}
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(recipe.title + ' recipe')}" target="_blank" class="recipe-link">▶ Watch on YouTube</a>
+                    <button class="save-recipe-btn" onclick="saveRecipeToProfile(${recipe.id}, '${recipe.title.replace(/'/g, "\\'")}')">📌 Save Recipe</button>
+                </div>
+            `;
+
+            const scaleInput = card.querySelector(`#scale-input-${recipe.id}`);
+            if (scaleInput) {
+                scaleInput.addEventListener('change', (e) => {
+                    let newMultiplier = parseFloat(e.target.value);
+                    if (isNaN(newMultiplier)) newMultiplier = 1;
+                    newMultiplier = Math.min(4, Math.max(0.5, newMultiplier));
+                    const multiplierSpan = document.getElementById(`multiplier-${recipe.id}`);
+                    if (multiplierSpan) multiplierSpan.textContent = newMultiplier.toFixed(1) + 'x';
+                    updateRecipeIngredients(recipe.id, newMultiplier, ingredientsList);
+                });
+            }
+
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    // Scale recipe ingredients
+    window.scaleRecipeIngredients = function(recipeId, originalServings, change, ingredientsJson) {
+        const multiplierSpan = document.getElementById(`multiplier-${recipeId}`);
+        let currentMultiplier = parseFloat(multiplierSpan.textContent);
+        if (isNaN(currentMultiplier)) currentMultiplier = 1;
+
+        let newMultiplier = currentMultiplier + change;
+        newMultiplier = Math.min(4, Math.max(0.5, newMultiplier));
+
+        multiplierSpan.textContent = newMultiplier.toFixed(1) + 'x';
+        const scaleInput = document.getElementById(`scale-input-${recipeId}`);
+        if (scaleInput) scaleInput.value = newMultiplier;
+
+        let ingredientsList;
+        try {
+            ingredientsList = JSON.parse(ingredientsJson);
+        } catch(e) {
+            ingredientsList = [];
+        }
+
+        updateRecipeIngredients(recipeId, newMultiplier, ingredientsList);
+    };
+
+    // Update ingredients display
+    function updateRecipeIngredients(recipeId, multiplier, ingredientsList) {
+        const ingredientsDiv = document.getElementById(`ingredients-${recipeId}`);
+        if (ingredientsDiv && ingredientsList.length > 0) {
+            const scaledItems = ingredientsList.map(ing => {
+                let scaledAmount = (ing.amount * multiplier).toFixed(1);
+                if (scaledAmount.endsWith('.0')) scaledAmount = parseInt(scaledAmount);
+                return `• ${scaledAmount} ${ing.unit} ${ing.name}`;
+            }).join('<br>');
+
+            ingredientsDiv.innerHTML = `<strong>📝 Ingredients & Quantities (scaled):</strong><br>${scaledItems}`;
+        }
+    }
+
+    // Save recipe to profile
+    async function saveRecipeToProfile(recipeId, recipeName) {
+        const userId = getCurrentUser();
+        if (!userId) return;
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/recipes/save?userId=${userId}&recipeId=${recipeId}&recipeName=${encodeURIComponent(recipeName)}`,
+                { method: 'POST' }
+            );
+
+            if (response.ok) {
+                showToast(`✅ "${recipeName}" saved to your profile!`);
+            } else {
+                showToast(`❌ Failed to save recipe`);
+            }
+        } catch (error) {
+            console.error('Error saving recipe:', error);
+            showToast(`❌ Error saving recipe`);
+        }
+    }
+
+    // Quick search
+    window.quickSearch = function(ingredients) {
+        document.getElementById('ingredients').value = ingredients;
+        performRecipeSearch();
+    };
+
+    // Logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('fullName');
+            window.location.href = 'login.html';
+        }
+    };
+
+    // Show toast
+    function showToast(message) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Enter key support
+    document.getElementById('ingredients').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performRecipeSearch();
+        }
+    });
+
+    // Load default recipes
+    setTimeout(() => {
+        performRecipeSearch();
+    }, 500);
+</script>
+</body>
+</html>

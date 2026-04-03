@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Green Trace - Food Waste Prevention | Smart Storage Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e6f7ec 100%);
+            margin-left: 240px;
+            transition: all 0.3s;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100%;
+            background: #1e6b3e;
+            padding-top: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3c9e6b;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin: 4px 0;
+        }
+
+        .sidebar a:hover {
+            background: #0f5a36;
+            padding-left: 30px;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 240px;
+            padding: 30px 40px;
+            max-width: 1400px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #1e6b3e;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e0f0e5;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2e8b57;
+        }
+
+        .stat-label {
+            color: #6c8b7a;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Common Section Style */
+        .section-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e0f0e5;
+        }
+
+        .section-title {
+            color: #1e6b3e;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Add Ingredient Form */
+        .add-form {
+            background: #f8fff9;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c5e42;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0f0e5;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2e8b57;
+            box-shadow: 0 0 0 3px rgba(46,139,86,0.1);
+        }
+
+        .btn-primary {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #1f6e45;
+            transform: translateY(-2px);
+        }
+
+        /* Quick Add Buttons */
+        .quick-add {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0f0e5;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-item {
+            background: #e0f0e4;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #1e6b3e;
+            transition: all 0.2s;
+        }
+
+        .quick-item:hover {
+            background: #2e8b57;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Camera Section */
+        .camera-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .video-wrapper {
+            background: #f8fff9;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            border: 2px solid #c8e0d2;
+            background: #000;
+        }
+
+        .camera-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-camera {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .btn-camera:hover {
+            background: #1f6e45;
+            transform: translateY(-2px);
+        }
+
+        .detection-result {
+            background: #f0f7f2;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        /* Inventory Grid */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .inventory-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            border-left: 4px solid #2e8b57;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .inventory-card.expiring-soon {
+            border-left-color: #ff9800;
+            background: #fff9e6;
+        }
+
+        .inventory-card.expired {
+            border-left-color: #c0392b;
+            background: #ffe8e8;
+            opacity: 0.7;
+        }
+
+        .inventory-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e6b3e;
+            margin-bottom: 8px;
+        }
+
+        .inventory-details {
+            font-size: 0.85rem;
+            color: #6c8b7a;
+            margin: 8px 0;
+        }
+
+        .shelf-life {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 10px;
+            background: #f8fff9;
+        }
+
+        .shelf-life-bar {
+            height: 8px;
+            background: #e0f0e5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .shelf-life-fill {
+            height: 100%;
+            background: #2e8b57;
+            transition: width 0.3s;
+        }
+
+        .shelf-life-fill.warning {
+            background: #ff9800;
+        }
+
+        .shelf-life-fill.critical {
+            background: #c0392b;
+        }
+
+        .delete-btn {
+            background: #c0392b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        /* Chatbot */
+        .chat-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            background: #f8fff9;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background: #2e8b57;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-content {
+            background: #e0f0e4;
+            color: #1e6b3e;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0f0e5;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0f0e5;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .chat-send {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .quick-questions {
+            display: flex;
+            gap: 10px;
+            padding: 10px 15px;
+            flex-wrap: wrap;
+            background: #f8fff9;
+        }
+
+        .quick-btn {
+            background: #e0f0e4;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #1e6b3e;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2e8b57;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #9bb7a8;
+            grid-column: 1/-1;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                margin-left: 0;
+            }
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .camera-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>🌱 Green Trace</h2>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="nutrition.html">📊 Nutrition Dashboard</a>
+    <a href="foodPrev.html">♻️ Waste Tracker</a>
+    <a href="login.html">🚪 Logout</a>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h1>🌍 Food Waste Prevention Hub</h1>
+        <p style="color: #6c8b7a; margin-top: 10px;">Track ingredients in your fridge, reduce waste, and get AI-powered storage tips!</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🥬</div>
+            <div class="stat-value" id="totalItems">0</div>
+            <div class="stat-label">Items in Fridge</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-value" id="expiringSoon">0</div>
+            <div class="stat-label">Expiring Soon (3 days)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💚</div>
+            <div class="stat-value" id="wasteSaved">0</div>
+            <div class="stat-label">kg Waste Prevented</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value" id="moneySaved">0</div>
+            <div class="stat-label">₹ Saved</div>
+        </div>
+    </div>
+
+    <!-- ADD INGREDIENT SECTION - MANUAL ADD -->
+    <div class="section-card">
+        <h3 class="section-title">➕ Add Ingredient to Fridge</h3>
+
+        <div class="add-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🥗 Ingredient Name *</label>
+                    <input type="text" id="ingredientName" placeholder="e.g., Tomato, Milk, Chicken, Spinach" list="ingredientSuggestions">
+                    <datalist id="ingredientSuggestions">
+                        <option>Tomato</option>
+                        <option>Milk</option>
+                        <option>Chicken</option>
+                        <option>Eggs</option>
+                        <option>Onion</option>
+                        <option>Potato</option>
+                        <option>Spinach</option>
+                        <option>Carrot</option>
+                        <option>Cheese</option>
+                        <option>Yogurt</option>
+                        <option>Bread</option>
+                        <option>Banana</option>
+                        <option>Apple</option>
+                        <option>Lettuce</option>
+                        <option>Cucumber</option>
+                        <option>Bell Pepper</option>
+                        <option>Mushroom</option>
+                        <option>Paneer</option>
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <label>📅 Storage Date *</label>
+                    <input type="date" id="storageDate">
+                </div>
+                <div class="form-group">
+                    <label>📦 Storage Location</label>
+                    <select id="storageLocation">
+                        <option value="fridge">Refrigerator</option>
+                        <option value="freezer">Freezer</option>
+                        <option value="pantry">Pantry</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="addIngredient()">➕ Add to Inventory</button>
+        </div>
+
+        <div class="quick-add">
+            <label style="color: #2c5e42; font-weight: 500;">⚡ Quick Add Common Items:</label>
+            <div class="quick-buttons">
+                <button class="quick-item" onclick="quickAdd('Tomato')">🍅 Tomato</button>
+                <button class="quick-item" onclick="quickAdd('Milk')">🥛 Milk</button>
+                <button class="quick-item" onclick="quickAdd('Eggs')">🥚 Eggs</button>
+                <button class="quick-item" onclick="quickAdd('Chicken')">🍗 Chicken</button>
+                <button class="quick-item" onclick="quickAdd('Spinach')">🥬 Spinach</button>
+                <button class="quick-item" onclick="quickAdd('Onion')">🧅 Onion</button>
+                <button class="quick-item" onclick="quickAdd('Cheese')">🧀 Cheese</button>
+                <button class="quick-item" onclick="quickAdd('Bread')">🍞 Bread</button>
+                <button class="quick-item" onclick="quickAdd('Apple')">🍎 Apple</button>
+                <button class="quick-item" onclick="quickAdd('Carrot')">🥕 Carrot</button>
+                <button class="quick-item" onclick="quickAdd('Paneer')">🫘 Paneer</button>
+                <button class="quick-item" onclick="quickAdd('Potato')">🥔 Potato</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera Detection Section -->
+    <div class="section-card">
+        <h3 class="section-title">📸 Scan Ingredient with Camera</h3>
+        <div class="camera-container">
+            <div class="video-wrapper">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <div class="camera-controls">
+                    <button class="btn-camera" onclick="startCamera()">📷 Start Camera</button>
+                    <button class="btn-camera" onclick="capturePhoto()">🎯 Capture & Detect</button>
+                    <button class="btn-camera" onclick="stopCamera()">⏹️ Stop Camera</button>
+                </div>
+            </div>
+            <div class="detection-result">
+                <h4>🔍 Detected Ingredient</h4>
+                <div id="detectionInfo">
+                    <p style="color: #6c8b7a;">Take a photo of an ingredient to detect it and get shelf-life info</p>
+                </div>
+                <div id="detectedForm" style="display: none; margin-top: 15px;">
+                    <input type="text" id="detectedIngredient" style="width: 100%; margin-bottom: 10px; padding: 10px; border: 2px solid #e0f0e5; border-radius: 12px;" placeholder="Ingredient name">
+                    <button class="btn-primary" style="width: 100%;" onclick="addDetectedIngredient()">➕ Add to Fridge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory List -->
+    <div class="section-card">
+        <h3 class="section-title">❄️ My Fridge Inventory</h3>
+        <div id="inventoryContainer" class="inventory-grid">
+            <div class="empty-state">✨ No items yet. Use the form above to add ingredients to your fridge!</div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot Section -->
+    <div class="section-card">
+        <h3 class="section-title">🤖 AI Food Assistant</h3>
+        <p style="color: #6c8b7a; margin-bottom: 15px;">Ask me anything about food storage, shelf life, or reducing waste!</p>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">
+                        👋 Hi! I'm your Food Waste Prevention Assistant. Ask me about:<br>
+                        • How to store vegetables 🥬<br>
+                        • Shelf life of ingredients 📅<br>
+                        • Tips to reduce waste 💡<br>
+                        • Recipes for leftovers 🍳
+                    </div>
+                </div>
+            </div>
+            <div class="quick-questions">
+                <button class="quick-btn" onclick="askQuickQuestion('How long does milk last?')">🥛 Milk shelf life</button>
+                <button class="quick-btn" onclick="askQuickQuestion('How to store tomatoes?')">🍅 Store tomatoes</button>
+                <button class="quick-btn" onclick="askQuickQuestion('Can I freeze eggs?')">🥚 Freeze eggs?</button>
+                <button class="quick-btn" onclick="askQuickQuestion('Tips to reduce food waste')">💚 Waste reduction tips</button>
+                <button class="quick-btn" onclick="askQuickQuestion('How to store paneer?')">🫘 Store paneer</button>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything about food storage..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button class="chat-send" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // API Configuration
+    const API_BASE_URL = 'http://localhost:8082/api';
+
+    // Food Database with Shelf Life
+    const foodDatabase = {
+        'tomato': { shelfLife: 7, storage: 'Refrigerate after ripe', wastePrevention: 'Store stem-side down at room temperature' },
+        'tomatoes': { shelfLife: 7, storage: 'Refrigerate after ripe', wastePrevention: 'Store stem-side down at room temperature' },
+        'milk': { shelfLife: 7, storage: 'Refrigerate at 4°C', wastePrevention: 'Keep in coldest part of fridge' },
+        'chicken': { shelfLife: 3, storage: 'Freeze if not using within 2 days', wastePrevention: 'Store in sealed container' },
+        'egg': { shelfLife: 21, storage: 'Refrigerate', wastePrevention: 'Keep in original carton' },
+        'eggs': { shelfLife: 21, storage: 'Refrigerate', wastePrevention: 'Keep in original carton' },
+        'onion': { shelfLife: 30, storage: 'Cool, dark place', wastePrevention: 'Don\'t store with potatoes' },
+        'onions': { shelfLife: 30, storage: 'Cool, dark place', wastePrevention: 'Don\'t store with potatoes' },
+        'potato': { shelfLife: 30, storage: 'Cool, dark place', wastePrevention: 'Remove sprouts before eating' },
+        'potatoes': { shelfLife: 30, storage: 'Cool, dark place', wastePrevention: 'Remove sprouts before eating' },
+        'spinach': { shelfLife: 5, storage: 'Refrigerate in sealed bag', wastePrevention: 'Place paper towel to absorb moisture' },
+        'carrot': { shelfLife: 14, storage: 'Refrigerate in water', wastePrevention: 'Remove greens before storing' },
+        'carrots': { shelfLife: 14, storage: 'Refrigerate in water', wastePrevention: 'Remove greens before storing' },
+        'cheese': { shelfLife: 30, storage: 'Refrigerate in cheese drawer', wastePrevention: 'Wrap in wax paper' },
+        'yogurt': { shelfLife: 14, storage: 'Refrigerate', wastePrevention: 'Don\'t leave out of fridge' },
+        'bread': { shelfLife: 5, storage: 'Freeze for longer storage', wastePrevention: 'Store in cool dry place' },
+        'banana': { shelfLife: 5, storage: 'Room temperature', wastePrevention: 'Freeze overripe bananas for smoothies' },
+        'bananas': { shelfLife: 5, storage: 'Room temperature', wastePrevention: 'Freeze overripe bananas for smoothies' },
+        'apple': { shelfLife: 30, storage: 'Refrigerate', wastePrevention: 'Store away from other fruits' },
+        'apples': { shelfLife: 30, storage: 'Refrigerate', wastePrevention: 'Store away from other fruits' },
+        'lettuce': { shelfLife: 5, storage: 'Refrigerate', wastePrevention: 'Store with paper towel' },
+        'cucumber': { shelfLife: 7, storage: 'Refrigerate', wastePrevention: 'Wrap in plastic' },
+        'bell pepper': { shelfLife: 10, storage: 'Refrigerate', wastePrevention: 'Store in crisper drawer' },
+        'mushroom': { shelfLife: 7, storage: 'Refrigerate in paper bag', wastePrevention: 'Don\'t wash until ready to use' },
+        'mushrooms': { shelfLife: 7, storage: 'Refrigerate in paper bag', wastePrevention: 'Don\'t wash until ready to use' },
+        'paneer': { shelfLife: 7, storage: 'Refrigerate in water', wastePrevention: 'Change water daily' }
+    };
+
+    // Inventory Data
+    let inventory = [];
+
+    // Get current user
+    function getCurrentUser() {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            window.location.href = 'login.html';
+            return null;
+        }
+        return userId;
+    }
+
+    // Load inventory
+    function loadInventory() {
+        const saved = localStorage.getItem('greenTraceInventory');
+        if (saved) {
+            inventory = JSON.parse(saved);
+        }
+        updateInventoryDisplay();
+        updateStats();
+    }
+
+    // Save inventory
+    function saveInventory() {
+        localStorage.setItem('greenTraceInventory', JSON.stringify(inventory));
+        updateInventoryDisplay();
+        updateStats();
+    }
+
+    // Calculate shelf life
+    function calculateShelfLife(ingredient, storageDate) {
+        const foodInfo = foodDatabase[ingredient.toLowerCase()] || { shelfLife: 7, storage: 'Refrigerate', wastePrevention: 'Use within a week' };
+        const storedDate = new Date(storageDate);
+        const today = new Date();
+        const daysPassed = Math.floor((today - storedDate) / (1000 * 60 * 60 * 24));
+        const daysRemaining = foodInfo.shelfLife - daysPassed;
+        const percentage = Math.max(0, Math.min(100, (daysRemaining / foodInfo.shelfLife) * 100));
+
+        let status = 'good';
+        if (daysRemaining <= 0) status = 'expired';
+        else if (daysRemaining <= 3) status = 'warning';
+
+        return { daysRemaining, percentage, status, foodInfo };
+    }
+
+    // Update inventory display
+    function updateInventoryDisplay() {
+        const container = document.getElementById('inventoryContainer');
+        if (!container) return;
+
+        if (!inventory || inventory.length === 0) {
+            container.innerHTML = '<div class="empty-state">✨ No items yet. Use the form above to add ingredients to your fridge!</div>';
+            return;
+        }
+
+        container.innerHTML = inventory.map((item, index) => {
+            const shelfData = calculateShelfLife(item.name, item.storageDate);
+            const statusClass = shelfData.status === 'warning' ? 'expiring-soon' : (shelfData.status === 'expired' ? 'expired' : '');
+            const fillClass = shelfData.percentage < 30 ? 'critical' : (shelfData.percentage < 60 ? 'warning' : '');
+
+            const statusText = shelfData.daysRemaining > 0
+                ? `⏰ ${shelfData.daysRemaining} days remaining`
+                : '❌ EXPIRED - Discard safely';
+
+            return `
+                <div class="inventory-card ${statusClass}">
+                    <div class="inventory-name">${item.name.charAt(0).toUpperCase() + item.name.slice(1)}</div>
+                    <div class="inventory-details">
+                        📅 Added: ${item.storageDate}<br>
+                        📍 Stored: ${item.location || 'Fridge'}<br>
+                        ⏱️ Best within: ${shelfData.foodInfo.shelfLife} days
+                    </div>
+                    <div class="shelf-life">
+                        <strong>${statusText}</strong>
+                        <div class="shelf-life-bar">
+                            <div class="shelf-life-fill ${fillClass}" style="width: ${Math.max(0, shelfData.percentage)}%"></div>
+                        </div>
+                    </div>
+                    <div class="inventory-details">
+                        💡 Tip: ${shelfData.foodInfo.wastePrevention}
+                    </div>
+                    <button class="delete-btn" onclick="removeItem(${index})">✅ Used / Removed</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Update stats
+    function updateStats() {
+        const total = inventory ? inventory.length : 0;
+        const expiringSoon = inventory ? inventory.filter(item => {
+            const shelfData = calculateShelfLife(item.name, item.storageDate);
+            return shelfData.daysRemaining > 0 && shelfData.daysRemaining <= 3;
+        }).length : 0;
+
+        const wasteSaved = (inventory ? inventory.filter(item => {
+            const shelfData = calculateShelfLife(item.name, item.storageDate);
+            return shelfData.daysRemaining > 0;
+        }).length * 0.2 : 0).toFixed(1);
+
+        const moneySaved = (wasteSaved * 50).toFixed(0);
+
+        document.getElementById('totalItems').textContent = total;
+        document.getElementById('expiringSoon').textContent = expiringSoon;
+        document.getElementById('wasteSaved').textContent = wasteSaved;
+        document.getElementById('moneySaved').textContent = moneySaved;
+    }
+
+    // Add ingredient
+    function addIngredient() {
+        const name = document.getElementById('ingredientName').value.trim();
+        const date = document.getElementById('storageDate').value;
+        const location = document.getElementById('storageLocation').value;
+
+        if (!name) {
+            showToast('Please enter ingredient name!');
+            return;
+        }
+        if (!date) {
+            showToast('Please select storage date!');
+            return;
+        }
+
+        inventory.push({
+            id: Date.now(),
+            name: name.toLowerCase(),
+            storageDate: date,
+            location: location,
+            addedDate: new Date().toISOString()
+        });
+
+        saveInventory();
+        document.getElementById('ingredientName').value = '';
+        document.getElementById('storageDate').value = new Date().toISOString().split('T')[0];
+        showToast(`✅ ${name} added to your fridge inventory!`);
+    }
+
+    // Quick add
+    function quickAdd(ingredient) {
+        document.getElementById('ingredientName').value = ingredient;
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('storageDate').value = today;
+        addIngredient();
+    }
+
+    // Remove item
+    function removeItem(index) {
+        const removed = inventory[index];
+        inventory.splice(index, 1);
+        saveInventory();
+        showToast(`🗑️ ${removed.name} removed from inventory`);
+    }
+
+    // Camera functions
+    let stream = null;
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            showToast('Camera started! Take a photo of an ingredient');
+        } catch (err) {
+            showToast('Unable to access camera. Please check permissions.');
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            showToast('Camera stopped');
+        }
+    }
+
+    function capturePhoto() {
+        if (!video.srcObject) {
+            showToast('Please start camera first!');
+            return;
+        }
+
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        simulateIngredientDetection();
+    }
+
+    // Simulate ingredient detection
+    function simulateIngredientDetection() {
+        const commonIngredients = ['Tomato', 'Apple', 'Banana', 'Carrot', 'Onion', 'Bell Pepper', 'Eggs', 'Milk', 'Spinach', 'Potato', 'Paneer', 'Mushroom', 'Cucumber', 'Lettuce', 'Cheese'];
+        const randomIngredient = commonIngredients[Math.floor(Math.random() * commonIngredients.length)];
+        const foodInfo = foodDatabase[randomIngredient.toLowerCase()] || { shelfLife: 7, storage: 'Store properly', wastePrevention: 'Use within a week' };
+
+        const detectionDiv = document.getElementById('detectionInfo');
+        const detectedForm = document.getElementById('detectedForm');
+
+        detectionDiv.innerHTML = `
+            <p style="color: #2e8b57; font-size: 1.1rem;">🔍 Detected: <strong>${randomIngredient}</strong></p>
+            <p>📊 Shelf life: ${foodInfo.shelfLife} days</p>
+            <p>💡 Storage tip: ${foodInfo.storage}</p>
+            <p>✨ ${foodInfo.wastePrevention}</p>
+        `;
+
+        document.getElementById('detectedIngredient').value = randomIngredient;
+        detectedForm.style.display = 'block';
+        showToast(`Detected: ${randomIngredient}! Add to inventory to track shelf life.`);
+    }
+
+    function addDetectedIngredient() {
+        const ingredient = document.getElementById('detectedIngredient').value.trim();
+        const today = new Date().toISOString().split('T')[0];
+
+        if (ingredient) {
+            inventory.push({
+                id: Date.now(),
+                name: ingredient.toLowerCase(),
+                storageDate: today,
+                location: 'fridge',
+                addedDate: new Date().toISOString()
+            });
+
+            saveInventory();
+            showToast(`✅ ${ingredient} added to your fridge inventory!`);
+
+            document.getElementById('detectionInfo').innerHTML = '<p style="color: #6c8b7a;">Take a photo of an ingredient to detect it and get shelf-life info</p>';
+            document.getElementById('detectedForm').style.display = 'none';
+            stopCamera();
+        }
+    }
+
+    // Chatbot functions
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        input.value = '';
+
+        setTimeout(() => {
+            const response = getAIResponse(message);
+            addMessage(response, 'bot');
+        }, 500);
+    }
+
+    function askQuickQuestion(question) {
+        addMessage(question, 'user');
+        setTimeout(() => {
+            const response = getAIResponse(question);
+            addMessage(response, 'bot');
+        }, 300);
+    }
+
+    function addMessage(text, sender) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function getAIResponse(question) {
+        const q = question.toLowerCase();
+
+        if (q.includes('milk')) return '🥛 Milk typically lasts 5-7 days in the refrigerator. Keep it in the coldest part (not the door). If it smells sour, discard.';
+        if (q.includes('egg')) return '🥚 Eggs last 3-5 weeks in the refrigerator! Store in original carton. Test freshness by placing in water - fresh eggs sink, old eggs float.';
+        if (q.includes('tomato')) return '🍅 Tomatoes last 5-7 days. Store at room temperature away from sunlight. Refrigerate only if very ripe. Never store with potatoes!';
+        if (q.includes('chicken')) return '🍗 Raw chicken lasts 1-2 days in fridge, or up to 9 months in freezer. Always store on bottom shelf to prevent cross-contamination.';
+        if (q.includes('freeze')) return '❄️ Most vegetables can be frozen! Blanch first to preserve nutrients. Freeze in airtight containers. Label with date for best results.';
+        if (q.includes('waste') || q.includes('reduce')) return '💚 Tips to reduce waste:\n• Plan meals before shopping\n• Store food properly\n• Use leftovers creatively\n• Compost unavoidable scraps\n• Freeze extras before they spoil';
+        if (q.includes('store')) return '📦 General storage tips:\n• Keep fridge at 4°C or below\n• Separate fruits from vegetables\n• Use airtight containers\n• First in, first out (FIFO) method';
+        if (q.includes('bread')) return '🍞 Bread lasts 3-5 days at room temperature. Freeze for longer storage! Toast frozen bread directly - it tastes fresh.';
+        if (q.includes('paneer')) return '🫘 Paneer lasts 5-7 days in the refrigerator. Store in water and change water daily to keep it fresh. You can also freeze for up to 3 months.';
+
+        return 'Great question! 🌱 For specific ingredient storage, tell me the name. I can help with shelf life, storage methods, and waste reduction tips!';
+    }
+
+    // Toast notification
+    function showToast(message) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Set default storage date to today
+    document.getElementById('storageDate').value = new Date().toISOString().split('T')[0];
+
+    // Initialize
+    loadInventory();
+</script>
+</body>
+</html>
