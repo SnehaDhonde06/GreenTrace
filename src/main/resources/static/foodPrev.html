@@ -226,7 +226,7 @@
             transform: scale(1.05);
         }
 
-        /* Camera Section */
+        /* Camera & Gallery Section */
         .camera-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -273,10 +273,61 @@
             transform: translateY(-2px);
         }
 
+        .gallery-upload {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .gallery-label {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .gallery-label:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+        }
+
+        #galleryInput {
+            display: none;
+        }
+
         .detection-result {
             background: #f0f7f2;
             border-radius: 15px;
             padding: 20px;
+        }
+
+        .ingredient-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ingredient-option {
+            background: #e0f0e4;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .ingredient-option:hover {
+            background: #2e8b57;
+            color: white;
         }
 
         /* Inventory Grid */
@@ -609,9 +660,9 @@
         </div>
     </div>
 
-    <!-- Camera Detection Section -->
+    <!-- Camera & Gallery Detection Section -->
     <div class="section-card">
-        <h3 class="section-title">📸 Scan Ingredient with Camera</h3>
+        <h3 class="section-title">📸 Scan Ingredient with Camera or Gallery</h3>
         <div class="camera-container">
             <div class="video-wrapper">
                 <video id="video" autoplay playsinline></video>
@@ -621,12 +672,17 @@
                     <button class="btn-camera" onclick="capturePhoto()">🎯 Capture & Detect</button>
                     <button class="btn-camera" onclick="stopCamera()">⏹️ Stop Camera</button>
                 </div>
+                <div class="gallery-upload">
+                    <label for="galleryInput" class="gallery-label">🖼️ Upload from Gallery</label>
+                    <input type="file" id="galleryInput" accept="image/*" onchange="uploadFromGallery(event)">
+                </div>
             </div>
             <div class="detection-result">
                 <h4>🔍 Detected Ingredient</h4>
                 <div id="detectionInfo">
-                    <p style="color: #6c8b7a;">Take a photo of an ingredient to detect it and get shelf-life info</p>
+                    <p style="color: #6c8b7a;">Take a photo or upload an image, then select the ingredient from the options below</p>
                 </div>
+                <div id="ingredientSelectorContainer" class="ingredient-selector"></div>
                 <div id="detectedForm" style="display: none; margin-top: 15px;">
                     <input type="text" id="detectedIngredient" style="width: 100%; margin-bottom: 10px; padding: 10px; border: 2px solid #e0f0e5; border-radius: 12px;" placeholder="Ingredient name">
                     <button class="btn-primary" style="width: 100%;" onclick="addDetectedIngredient()">➕ Add to Fridge</button>
@@ -709,8 +765,12 @@
         'paneer': { shelfLife: 7, storage: 'Refrigerate in water', wastePrevention: 'Change water daily' }
     };
 
+    // Common ingredients list for selector
+    const commonIngredients = ['Tomato', 'Apple', 'Banana', 'Carrot', 'Onion', 'Potato', 'Spinach', 'Milk', 'Eggs', 'Cheese', 'Yogurt', 'Paneer', 'Chicken', 'Mushroom', 'Cucumber', 'Lettuce', 'Bell Pepper', 'Bread', 'Garlic', 'Ginger'];
+
     // Inventory Data
     let inventory = [];
+    let currentImageData = null;
 
     // Get current user
     function getCurrentUser() {
@@ -863,6 +923,32 @@
         showToast(`🗑️ ${removed.name} removed from inventory`);
     }
 
+    // Display ingredient selector
+    function showIngredientSelector() {
+        const container = document.getElementById('ingredientSelectorContainer');
+        container.innerHTML = commonIngredients.map(ing => `
+            <button class="ingredient-option" onclick="selectIngredient('${ing}')">${ing}</button>
+        `).join('');
+        document.getElementById('detectedForm').style.display = 'block';
+    }
+
+    // Select ingredient from list
+    function selectIngredient(ingredient) {
+        const foodInfo = foodDatabase[ingredient.toLowerCase()] || { shelfLife: 7, storage: 'Store properly', wastePrevention: 'Use within a week' };
+
+        const detectionDiv = document.getElementById('detectionInfo');
+        detectionDiv.innerHTML = `
+            <p style="color: #2e8b57; font-size: 1.1rem;">✅ Selected: <strong>${ingredient}</strong></p>
+            <p>📊 Shelf life: ${foodInfo.shelfLife} days</p>
+            <p>💡 Storage tip: ${foodInfo.storage}</p>
+            <p>✨ ${foodInfo.wastePrevention}</p>
+        `;
+
+        document.getElementById('detectedIngredient').value = ingredient;
+        document.getElementById('ingredientSelectorContainer').innerHTML = '';
+        showToast(`Selected: ${ingredient}! Click "Add to Fridge" to save.`);
+    }
+
     // Camera functions
     let stream = null;
     const video = document.getElementById('video');
@@ -896,28 +982,33 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        simulateIngredientDetection();
+
+        showToast('📸 Photo captured! Select the ingredient from options below.');
+        showIngredientSelector();
     }
 
-    // Simulate ingredient detection
-    function simulateIngredientDetection() {
-        const commonIngredients = ['Tomato', 'Apple', 'Banana', 'Carrot', 'Onion', 'Bell Pepper', 'Eggs', 'Milk', 'Spinach', 'Potato', 'Paneer', 'Mushroom', 'Cucumber', 'Lettuce', 'Cheese'];
-        const randomIngredient = commonIngredients[Math.floor(Math.random() * commonIngredients.length)];
-        const foodInfo = foodDatabase[randomIngredient.toLowerCase()] || { shelfLife: 7, storage: 'Store properly', wastePrevention: 'Use within a week' };
+    // Gallery upload function
+    function uploadFromGallery(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-        const detectionDiv = document.getElementById('detectionInfo');
-        const detectedForm = document.getElementById('detectedForm');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                showToast('📸 Image uploaded! Select the ingredient from options below.');
+                showIngredientSelector();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
 
-        detectionDiv.innerHTML = `
-            <p style="color: #2e8b57; font-size: 1.1rem;">🔍 Detected: <strong>${randomIngredient}</strong></p>
-            <p>📊 Shelf life: ${foodInfo.shelfLife} days</p>
-            <p>💡 Storage tip: ${foodInfo.storage}</p>
-            <p>✨ ${foodInfo.wastePrevention}</p>
-        `;
-
-        document.getElementById('detectedIngredient').value = randomIngredient;
-        detectedForm.style.display = 'block';
-        showToast(`Detected: ${randomIngredient}! Add to inventory to track shelf life.`);
+        // Reset gallery input
+        event.target.value = '';
     }
 
     function addDetectedIngredient() {
@@ -936,9 +1027,14 @@
             saveInventory();
             showToast(`✅ ${ingredient} added to your fridge inventory!`);
 
-            document.getElementById('detectionInfo').innerHTML = '<p style="color: #6c8b7a;">Take a photo of an ingredient to detect it and get shelf-life info</p>';
+            // Reset detection section
+            document.getElementById('detectionInfo').innerHTML = '<p style="color: #6c8b7a;">Take a photo or upload an image, then select the ingredient from the options below</p>';
+            document.getElementById('ingredientSelectorContainer').innerHTML = '';
             document.getElementById('detectedForm').style.display = 'none';
+            document.getElementById('detectedIngredient').value = '';
             stopCamera();
+        } else {
+            showToast('Please select or enter an ingredient name!');
         }
     }
 
