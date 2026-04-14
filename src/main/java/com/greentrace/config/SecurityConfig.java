@@ -34,7 +34,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/users/**", "/recipes/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**").permitAll()
+                        .requestMatchers("/auth/**", "/users/**", "/recipes/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**","/static/**",
+                                "/login.html",
+                                "/signup.html",
+                                "/dashboard.html",
+                                "/profile.html",
+                                "/nutrition.html",
+                                "/foodPrev.html",
+                                "/",
+                                "/*.html",
+                                "/*.css",
+                                "/*.js").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
