@@ -83,11 +83,12 @@ public class UserService {
 
     // Used by AuthController
     public Map<String, Object> authenticate(LoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+        // ✅ Use email to find user
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new RuntimeException("Invalid email or password");
         }
 
         Map<String, Object> response = new HashMap<>();

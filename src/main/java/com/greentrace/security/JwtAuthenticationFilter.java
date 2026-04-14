@@ -25,6 +25,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    // ✅ ADD THIS METHOD - Skip filtering for public endpoints
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+
+        // Public endpoints that don't need JWT validation
+        return path.startsWith("/auth/") ||
+                path.startsWith("/api-docs") ||
+                path.startsWith("/swagger-ui") ||
+                path.equals("/actuator/health") ||
+                path.endsWith(".html") ||
+                path.endsWith(".css") ||
+                path.endsWith(".js") ||
+                path.equals("/") ||
+                path.startsWith("/static/");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
